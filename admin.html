@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nightborn — Адмінка</title>
+    <style>
+        body { background: #111; color: #fff; font-family: Arial, sans-serif; padding: 20px; }
+        h1 { color: #e50914; }
+        input, textarea { width: 100%; padding: 10px; margin: 5px 0; background: #222; color: #fff; border: 1px solid #444; }
+        button { background: #e50914; color: #fff; padding: 10px 20px; border: none; cursor: pointer; }
+        button:hover { background: #b20710; }
+        #list { margin-top: 20px; }
+        .item { background: #1a1a1a; padding: 10px; margin: 10px 0; border-left: 4px solid #e50914; }
+    </style>
+</head>
+<body>
+    <h1>Nightborn — Адмінка</h1>
+    <p>Тут ти зможеш додавати контент. Поки що це демо.</p>
+
+    <input type="text" id="title" placeholder="Заголовок">
+    <textarea id="content" rows="4" placeholder="Текст..."></textarea>
+    <button onclick="addItem()">Додати</button>
+
+    <div id="list"></div>
+
+    <script>
+        function addItem() {
+            const title = document.getElementById('title').value;
+            const content = document.getElementById('content').value;
+            if (!title || !content) return alert('Заповни всі поля');
+
+            const list = document.getElementById('list');
+            const div = document.createElement('div');
+            div.className = 'item';
+            div.innerHTML = `<strong>${title}</strong><p>${content}</p>`;
+            list.appendChild(div);
+
+            document.getElementById('title').value = '';
+            document.getElementById('content').value = '';
+        }
+    </script>
+</body>
+</html>
