@@ -5,12 +5,58 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nightborn</title>
     <style>
-        body { background-color: #111; color: #fff; font-family: Arial, sans-serif; text-align: center; padding-top: 100px; }
+        body { background-color: #111; color: #fff; font-family: Arial, sans-serif; padding: 20px; max-width: 900px; margin: 0 auto; }
         h1 { color: #e50914; }
+        .item { background: #1a1a1a; padding: 15px; margin: 15px 0; border-left: 4px solid #e50914; }
+        .item h2 { margin-top: 0; }
+        .loading { color: #888; }
+        a { color: #e50914; }
     </style>
 </head>
 <body>
     <h1>Nightborn</h1>
-    <p>Сайт успішно запущено! Скоро тут з'явиться контент.</p>
+    <p><a href="admin.html">→ Адмінка</a></p>
+    <div id="content" class="loading">Завантаження...</div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+        import { getFirestore, collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDOECv9EM82sQrxRzgtCz_F0M8wDIEfqDk",
+            authDomain: "nightborn-ee760.firebaseapp.com",
+            projectId: "nightborn-ee760",
+            storageBucket: "nightborn-ee760.firebasestorage.app",
+            messagingSenderId: "875574092597",
+            appId: "1:875574092597:web:d6ad5323c8d930ee09627c"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        async function loadPosts() {
+            const container = document.getElementById('content');
+            try {
+                const q = query(collection(db, "posts"), orderBy("createdAt", "desc"));
+                const snapshot = await getDocs(q);
+                if (snapshot.empty) {
+                    container.innerHTML = "Поки що немає записів.";
+                    return;
+                }
+                container.innerHTML = "";
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    const div = document.createElement('div');
+                    div.className = 'item';
+                    div.innerHTML = `<h2>${data.title}</h2><p>${data.content}</p>`;
+                    container.appendChild(div);
+                });
+            } catch (e) {
+                container.innerHTML = "Помилка завантаження: " + e.message;
+                console.error(e);
+            }
+        }
+        loadPosts();
+    </script>
 </body>
 </html>
