@@ -5,40 +5,67 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nightborn — Адмінка</title>
     <style>
-        body { background: #111; color: #fff; font-family: Arial, sans-serif; padding: 20px; }
+        body { background: #111; color: #fff; font-family: Arial, sans-serif; padding: 20px; max-width: 900px; margin: 0 auto; }
         h1 { color: #e50914; }
-        input, textarea { width: 100%; padding: 10px; margin: 5px 0; background: #222; color: #fff; border: 1px solid #444; }
+        input, textarea { width: 100%; padding: 10px; margin: 5px 0; background: #222; color: #fff; border: 1px solid #444; box-sizing: border-box; }
         button { background: #e50914; color: #fff; padding: 10px 20px; border: none; cursor: pointer; }
         button:hover { background: #b20710; }
-        #list { margin-top: 20px; }
-        .item { background: #1a1a1a; padding: 10px; margin: 10px 0; border-left: 4px solid #e50914; }
+        #status { margin-top: 10px; color: #4ade80; }
+        a { color: #e50914; }
     </style>
 </head>
 <body>
     <h1>Nightborn — Адмінка</h1>
-    <p>Тут ти зможеш додавати контент. Поки що це демо.</p>
+    <p><a href="index.html">← На головну</a></p>
 
     <input type="text" id="title" placeholder="Заголовок">
-    <textarea id="content" rows="4" placeholder="Текст..."></textarea>
-    <button onclick="addItem()">Додати</button>
+    <textarea id="content" rows="6" placeholder="Текст..."></textarea>
+    <button onclick="addPost()">Додати запис</button>
+    <div id="status"></div>
 
-    <div id="list"></div>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-    <script>
-        function addItem() {
-            const title = document.getElementById('title').value;
-            const content = document.getElementById('content').value;
-            if (!title || !content) return alert('Заповни всі поля');
+        const firebaseConfig = {
+            apiKey: "AIzaSyDOECv9EM82sQrxRzgtCz_F0M8wDIEfqDk",
+            authDomain: "nightborn-ee760.firebaseapp.com",
+            projectId: "nightborn-ee760",
+            storageBucket: "nightborn-ee760.firebasestorage.app",
+            messagingSenderId: "875574092597",
+            appId: "1:875574092597:web:d6ad5323c8d930ee09627c"
+        };
 
-            const list = document.getElementById('list');
-            const div = document.createElement('div');
-            div.className = 'item';
-            div.innerHTML = `<strong>${title}</strong><p>${content}</p>`;
-            list.appendChild(div);
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
 
-            document.getElementById('title').value = '';
-            document.getElementById('content').value = '';
-        }
+        window.addPost = async function() {
+            const title = document.getElementById('title').value.trim();
+            const content = document.getElementById('content').value.trim();
+            const status = document.getElementById('status');
+
+            if (!title || !content) {
+                status.style.color = '#f87171';
+                status.textContent = 'Заповни обидва поля!';
+                return;
+            }
+
+            try {
+                await addDoc(collection(db, "posts"), {
+                    title: title,
+                    content: content,
+                    createdAt: serverTimestamp()
+                });
+                status.style.color = '#4ade80';
+                status.textContent = '✅ Запис додано! Він з\'явиться на головній сторінці.';
+                document.getElementById('title').value = '';
+                document.getElementById('content').value = '';
+            } catch (e) {
+                status.style.color = '#f87171';
+                status.textContent = '❌ Помилка: ' + e.message;
+                console.error(e);
+            }
+        };
     </script>
 </body>
 </html>
